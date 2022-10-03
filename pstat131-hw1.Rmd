@@ -1,0 +1,106 @@
+---
+title: "PSTAT131-HW1"
+author: "Eric Liu"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Machine Learning Main ideas
+
+### Question 1
+
+Supervised learning: supervised learning is fitting models that relates the response to the predictors, with the aim of accurately predicting the response for future observations or better understanding the relationship between the response and the predictors (from page 26 of the book). \
+Unsupervised learning: unsupervised learning involves no response variable to predict, with the aim of understanding the relationships between the variables or between the observations. \
+The difference between supervised and unsupervised learning is that one uses both the response and the predictors, and the other one only uses the predictors or the inputs without the response or the output.
+
+### Question 2
+
+In regression ML problems, the response or the output is quantitative and is numerical values. \
+In classification ML problems, the response or the output is qualitative and is categorical values. 
+
+### Question 3
+
+Metrics for regression models: MSE(mean square error), $R^2$(R square) \
+Metrics for classification models: error rate, Bayes classifier
+
+### Question 4
+
+Descriptive models: descriptive models are used to best visually emphasize a trend in data, such as using a line on a scatterplot(from lecture). \
+Inferential models: inferential models are used to understand the relationship between the response and the predictors, and we need to know the exact form of the function $f$. \
+Predictive models: predictive models are used to best predict the future response with minimum reducible error with the choice of combo of features that fit the best, and we may not need to know the exact form of the function $f$.
+
+### Question 5
+
+Mechanistic methods: first assume a parametric form for the function $f$, and use the training data to fit parameters. \
+Empirically-driven methods: make no assumptions about the function $f$, and seek an estimate of $f$ that gets as close to the data points as possible. \
+The difference between them is that, mechanistic methods assumes the function $f$ before the training, but empirically-driven methods doesn't need such assumption. Because of this, empirically-driven methods are more flexible by default, although mechanistic methods can be more flexible by adding parameters. In addition, mechanistic methods may not match the true unknown $f$. Lastly, compared to mechanistic methods, empirically-driven methods require larger numbers of observations. \
+The similarity between them is that they can both result in overfitting. \
+
+In general, mechanistic model is easier to understand. Since the form of the function $f$ is assumed before the training, we have more information about the model. \
+
+Generally, more flexible methods have higher variance and lower bias. Since empirically-driven methods are more flexible than mechanistic methods, empirically-driven methods will have higher variance and lower bias in general, compared to mechanistic methods, and mechanistic methods will have lower variance and higher bias. Because it is nearly impossible to find a method with both low variance and low bias, there is a bias-variance tradeoff, so there is also a tradeoff between the use of mechanistic methods and the use of empirically-driven methods.
+
+### Question 6
+
+The first question is predictive, because we are asked to predict the response, which is the likelihood of voting in favor of the candidate, given the predictors, which are a voter's profile. Therefore, we focus on the prediction for this question. \
+The second question is inferential, because we are interested in the relationship between the response and the predictors, and in this question we are interested in the relationship between the likelihood of support between whether voters have personal contact with the candidate.
+
+## Exploratory Data Analysis
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+head(mpg)
+```
+
+### Exercise 1
+
+```{r}
+ggplot(mpg) + geom_histogram(mapping = aes(x=hwy), binwidth = 1) + labs(x="highway miles per gallon")
+```
+
+From the histogram, we can see that most cars have hwy in the range 10 to 40. There are 3 hwy values that have outstandingly high counts, which are around 17, 26, and 29.
+
+### Exercise 2
+
+```{r}
+ggplot(mpg) + geom_point(mapping = aes(x=hwy, y=cty))
+```
+
+From the scatterplot, we can see that there is a almost positive linear relationship between hwy and cty, which means that cty increases as hwy increases and the increments of hwy and cty are nearly constantly proportional. In the context of this dataset, cars that have higher highway miles per gallon also have higher city miles per gallon, and cars that have lower highway miles per gallon also have lower city miles per gallon
+
+### Exercise 3
+
+```{r}
+ggplot(mpg) + 
+  geom_bar(mapping = aes(x=reorder(manufacturer,manufacturer,function(x)-length(x)))) +
+  labs(x="manufacturer") +
+  coord_flip()
+```
+
+Dodge produced the most cars, and Lincoln produced the least.
+
+### Exercise 4
+
+```{r}
+ggplot(mpg) + geom_boxplot(mapping = aes(x=hwy, y=factor(cyl))) + labs(y="cyl")
+```
+
+There is a pattern in the box plot. Cars with fewer cylinders have higher hwy on average.
+
+### Exercise 5
+
+```{r}
+library(corrplot)
+mpg_num = mpg %>% select(displ, year, cyl, cty, hwy)
+M = cor(mpg_num)
+corrplot(M, method = 'number', order = 'FPC', type = 'lower')
+```
+
+hwy and cty, cyl and displ are positively correlated. \
+Year are nearly not correlated with other variables. \
+displ and cty, displ and hwy, cyl and cty, cyl and hwy are negatively correlated. \
+All of these relationships make sense to me.
